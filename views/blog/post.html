@@ -1,0 +1,25 @@
+{{ define "yield" }}
+<div class="container">
+    <div class="jumbotron">
+        <div class="text-center">
+            <h4>{{ .Title }}</h4>
+            <a class="btn btn-primary" href="/update/{{ .ID }}">update</a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <p>
+                Post ID = {{ .ID }}
+            </p>
+            <p>
+                {{ .Body }}
+            </p>
+            <p>
+                <a class="btn btn-danger" href="/post/delete/{{ .ID }}">delete</a>
+            </p>
+        </div>
+    </div>
+</div>
+{{ end }}

@@ -1,0 +1,74 @@
+{{ define "yield" }}
+<style>
+    .jumbotron {
+        background: none;
+    }
+
+    .page-title {
+        font-weight: 900;
+        border-radius: 50px;
+        background: #ffffff;
+        text-shadow: 20px 20px 60px #d9d9d9,
+            -20px -20px 60px #ffffff;
+    }
+
+    .card {
+        background: #ffffff;
+        box-shadow: 5px 5px 30px #d9d9d9,
+            -5px -5px 30px #ffffff;
+        border: 0px;
+    }
+
+    .card-title {
+        font-weight: 500;
+    }
+
+    .card-text>div {
+        color: lightslategray;
+    }
+
+    .blog-text {
+        color: lightslategray;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="jumbotron">
+                <h3 class="text-left page-title">
+                    Welcome to My Blog
+                </h3>
+                <p>Daily curated list of my thoughts on software engineering.</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card-deck">
+            {{  range . }}
+            <div class="col-lg-3 col-sm-6 col-xs-6">
+                <div class="card" style="width:100%">
+                    <!-- <img class="card-img-top" src="img_avatar1.png" alt="Card image"> -->
+                    <div class="card-body">
+                        <h4 class="card-title">{{ .Title }}</h4>
+                        <p class="card-text">
+                        <div class="blog-text">
+                            {{ .Body  }}
+                        </div>
+                        </p>
+                        <a href="/post/{{ .ID }}" class="btn btn-primary">view</a>
+                    </div>
+                </div>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+    <script>
+        let texts = document.getElementsByClassName("blog-text");
+        for (let i = 0; i < texts.length; i++) {
+            let data = texts[i].textContent.substring(0, 100);
+            console.log(data)
+            texts[i].textContent = `${data}...`;
+        }
+    </script>
+</div>
+{{ end }}
