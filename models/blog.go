@@ -24,10 +24,15 @@ type BlogService struct {
 }
 
 // NewBlogService returns the BlogService struct
-func NewBlogService(db *gorm.DB) BlogService {
-	return BlogService{
-		db: db,
+func NewBlogService(connectionInfo string) (*BlogService, error) {
+	db, err := gorm.Open("postgres", connectionInfo)
+	if err != nil {
+		return nil, err
 	}
+	db.LogMode(true)
+	return &BlogService{
+		db: db,
+	}, nil
 }
 
 // All returns all blogs
@@ -67,8 +72,5 @@ func (bs BlogService) Delete(id string) error {
 
 // AutoMigrate automatically creates tables
 func (bs BlogService) AutoMigrate() error {
-	if err := bs.db.AutoMigrate(BlogModel{}).Error; err != nil {
-		return err
-	}
-	return nil
+	return bs.db.AutoMigrate(BlogModel{}).Error
 }

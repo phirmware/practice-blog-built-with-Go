@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
-
 	"practice.blog.com/models"
 
 	"practice.blog.com/views"
@@ -15,7 +13,7 @@ import (
 type User struct {
 	NewView views.View
 	AllView views.View
-	us      models.UserService
+	us      *models.UserService
 }
 
 type signupform struct {
@@ -25,11 +23,11 @@ type signupform struct {
 }
 
 // NewUser returns the user struct
-func NewUser(db *gorm.DB) User {
+func NewUser(us *models.UserService) User {
 	return User{
 		NewView: views.NewView("bootstrap", "user/new"),
 		AllView: views.NewView("bootstrap", "user/all"),
-		us:      models.NewUserService(db),
+		us:      us,
 	}
 }
 

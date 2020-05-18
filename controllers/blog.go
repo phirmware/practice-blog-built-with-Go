@@ -8,8 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/jinzhu/gorm"
-
 	"practice.blog.com/models"
 
 	"practice.blog.com/views"
@@ -21,7 +19,7 @@ type Blog struct {
 	PostView       views.View
 	SinglePostView views.View
 	UpdateView     views.View
-	bs             models.BlogService
+	bs             *models.BlogService
 }
 
 // BlogForm defines the shape of the blogform
@@ -31,13 +29,13 @@ type BlogForm struct {
 }
 
 // NewBlog returns the Blog struct
-func NewBlog(db *gorm.DB) Blog {
+func NewBlog(bs *models.BlogService) Blog {
 	return Blog{
 		HomeView:       views.NewView("bootstrap", "blog/home"),
 		PostView:       views.NewView("bootstrap", "blog/new"),
 		SinglePostView: views.NewView("bootstrap", "blog/post"),
 		UpdateView:     views.NewView("bootstrap", "blog/update"),
-		bs:             models.NewBlogService(db),
+		bs:             bs,
 	}
 }
 
@@ -118,9 +116,4 @@ func (b Blog) Delete(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
-}
-
-// AutoMigrate calls the automigrate func on blogservice
-func (b Blog) AutoMigrate() error {
-	return b.bs.AutoMigrate()
 }

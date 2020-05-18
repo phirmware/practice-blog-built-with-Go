@@ -25,10 +25,14 @@ type UserService struct {
 }
 
 // NewUserService returns the UserService
-func NewUserService(db *gorm.DB) UserService {
-	return UserService{
-		db: db,
+func NewUserService(connectionInfo string) (*UserService, error) {
+	db, err := gorm.Open("postgres", connectionInfo)
+	if err != nil {
+		return nil, err
 	}
+	return &UserService{
+		db: db,
+	}, nil
 }
 
 // FindAll finds all users
@@ -49,4 +53,9 @@ func (us UserService) Create(user *UserModel) error {
 	user.PasswordHash = string(hash)
 	user.Password = ""
 	return us.db.Create(&user).Error
+}
+
+// AutoMigrate creates the user table in the DB
+func (us UserService) AutoMigrate() error {
+	return us.db.AutoMigrate(UserModel{}).Error
 }

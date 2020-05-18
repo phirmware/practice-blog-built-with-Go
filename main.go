@@ -6,8 +6,6 @@ import (
 
 	"practice.blog.com/models"
 
-	"github.com/jinzhu/gorm"
-
 	"practice.blog.com/controllers"
 
 	"github.com/gorilla/mux"
@@ -25,17 +23,24 @@ const (
 
 func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable", host, port, user, dbname)
-	db, err := gorm.Open("postgres", psqlInfo)
+	bs, err := models.NewBlogService(psqlInfo)
 	if err != nil {
 		panic(err)
 	}
-	db.LogMode(true)
-
-	blogC := controllers.NewBlog(db)
-	userC := controllers.NewUser(db)
-	if err := controllers.AutoMigrate(db, models.BlogModel{}, models.UserModel{}); err != nil {
+	us, err := models.NewUserService(psqlInfo)
+	if err != nil {
 		panic(err)
 	}
+
+	if err := bs.AutoMigrate(); err != nil {
+		panic(err)
+	}
+	if err := us.AutoMigrate(); err != nil {
+		panic(err)
+	}
+
+	blogC := controllers.NewBlog(bs)
+	userC := controllers.NewUser(us)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", blogC.Home)
