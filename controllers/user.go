@@ -45,8 +45,10 @@ func (u User) Register(w http.ResponseWriter, r *http.Request) {
 		Email:    form.Email,
 		Password: form.Password,
 	}
-	u.us.Create(&user)
-	fmt.Println(user)
+	if err := u.us.Create(&user); err != nil {
+		fmt.Fprint(w, err)
+	}
+	fmt.Fprintln(w, user)
 }
 
 // FindAll finds all users

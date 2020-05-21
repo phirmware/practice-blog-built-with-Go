@@ -1,23 +1,38 @@
 {{ define "yield" }}
 <div class="container">
+    <style>
+        .jumbotron{
+            background: none;
+        }
+        .blog_title{
+            font-weight: bold;
+            font-size: 3em;
+        }
+        .blog_body{
+            font-size: 1.3rem;
+            font-weight: lighter;
+            line-height: 50px;
+            color: lightslategray;
+            max-width: 70%;
+            margin: auto;
+        }
+    </style>
     <div class="jumbotron">
         <div class="text-center">
-            <h4>{{ .Title }}</h4>
-            <a class="btn btn-primary" href="/update/{{ .ID }}">update</a>
+            <h4 class="blog_title">{{ .Title }}</h4>
         </div>
     </div>
 </div>
 <div class="container">
     <div class="row">
-        <div class="col-lg-12 text-center">
-            <p>
-                Post ID = {{ .ID }}
-            </p>
+        <div class="col-lg-12 blog_body">
             <p>
                 {{ .Body }}
             </p>
+            <br>
             <p>
-                <a class="btn btn-danger" href="/post/delete/{{ .ID }}">delete</a>
+                <a class="btn btn-danger" href="/post/delete/{{ .ID }}">Delete</a>
+                <a class="btn btn-primary" href="/update/{{ .ID }}">Update</a>
             </p>
         </div>
     </div>

@@ -1,5 +1,11 @@
 {{ define "yield" }}
 <div class="container">
+    <style>
+        form {
+            width: 70%;
+            margin: 20px auto;
+        }
+    </style>
     <div class="row">
         <div class="col-lg-12">
             <form action="/update/{{ .ID }}" method="POST" class="needs-validation" novalidate>
