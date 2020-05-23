@@ -57,6 +57,7 @@ func (b Blog) Post(w http.ResponseWriter, r *http.Request) {
 // HandlePost handles /post POST PATH
 func (b Blog) HandlePost(w http.ResponseWriter, r *http.Request) {
 	var form BlogForm
+	var data views.Data
 	if err := ParseForm(r, &form); err != nil {
 		panic(err)
 	}
@@ -65,7 +66,13 @@ func (b Blog) HandlePost(w http.ResponseWriter, r *http.Request) {
 		Body:  form.Body,
 	}
 	if err := b.bs.Create(&blog); err != nil {
-		panic(err)
+		fmt.Println("something went wrong")
+		data.Alert = &views.Alert{
+			Level:   "info",
+			Message: err.Error(),
+		}
+		b.PostView.Render(w, data)
+		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }

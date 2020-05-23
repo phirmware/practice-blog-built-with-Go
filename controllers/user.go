@@ -39,6 +39,7 @@ func (u User) New(w http.ResponseWriter, r *http.Request) {
 // Register creates a new user
 func (u User) Register(w http.ResponseWriter, r *http.Request) {
 	var form signupform
+	var data views.Data
 	ParseForm(r, &form)
 	user := models.UserModel{
 		Username: form.Username,
@@ -46,7 +47,11 @@ func (u User) Register(w http.ResponseWriter, r *http.Request) {
 		Password: form.Password,
 	}
 	if err := u.us.Create(&user); err != nil {
-		fmt.Fprint(w, err)
+		data.Alert = &views.Alert{
+			Level:   "danger",
+			Message: err.Error(),
+		}
+		u.NewView.Render(w, data)
 	}
 	fmt.Fprintln(w, user)
 }

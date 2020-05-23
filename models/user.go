@@ -5,15 +5,21 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+	"lenslocked.com/hash"
+	"lenslocked.com/rand"
 )
 
 const (
-	pepper = "my-secret-pepper"
+	pepper        = "my-secret-pepper"
+	hmacsecretkey = "my-hmac-key"
 )
 
 var (
 	// ErrPasswordMissing is returned whnen a password is not provided
 	ErrPasswordMissing = errors.New("models: no password was provided")
+	// ErrRememberMissing is returned when a remember token is missing
+	ErrRememberMissing  = errors.New("models: no token in remember field")
+	ErrPasswordTooShort = errors.New("models: Password must ne at least 8 characters")
 )
 
 // UserModel defines the shape of the user
@@ -46,6 +52,7 @@ type userGorm struct {
 
 type userValidation struct {
 	UserDB
+	hmac hash.HMAC
 }
 
 type userValFn func(user *UserModel) error
@@ -70,8 +77,10 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 }
 
 func newUserValidation(ug *userGorm) *userValidation {
+	hmac := hash.NewHMAC(hmacsecretkey)
 	return &userValidation{
 		UserDB: ug,
+		hmac:   hmac,
 	}
 }
 
@@ -102,7 +111,7 @@ func (ug *userGorm) Create(user *UserModel) error {
 }
 
 func (uv *userValidation) Create(user *UserModel) error {
-	if err := runUserValFn(user, uv.checkForPassword, uv.hashPassword); err != nil {
+	if err := runUserValFn(user, uv.checkForPassword, uv.minPasswordLength, uv.hashPassword, uv.generateRemember, uv.hashRemember); err != nil {
 		return err
 	}
 	return uv.UserDB.Create(user)
@@ -119,9 +128,34 @@ func (uv *userValidation) hashPassword(user *UserModel) error {
 	return nil
 }
 
+func (uv *userValidation) generateRemember(user *UserModel) error {
+	randToken, err := rand.RememberToken()
+	if err != nil {
+		return err
+	}
+	user.Remember = randToken
+	return nil
+}
+
+func (uv *userValidation) hashRemember(user *UserModel) error {
+	if user.Remember == "" {
+		return ErrRememberMissing
+	}
+	hash := uv.hmac.Hash(user.Remember)
+	user.RememberHash = hash
+	return nil
+}
+
 func (uv *userValidation) checkForPassword(user *UserModel) error {
 	if user.Password == "" {
 		return ErrPasswordMissing
+	}
+	return nil
+}
+
+func (uv *userValidation) minPasswordLength(user *UserModel) error {
+	if len(user.Password) < 8 {
+		return ErrPasswordTooShort
 	}
 	return nil
 }

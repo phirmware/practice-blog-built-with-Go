@@ -47,5 +47,11 @@ func NewView(layout string, files ...string) View {
 
 // Render renders the html page specified
 func (v View) Render(w http.ResponseWriter, data interface{}) error {
+	if _, b := data.(Data); b {
+	} else {
+		data = &Data{
+			Yield: data,
+		}
+	}
 	return v.t.ExecuteTemplate(w, v.layout, data)
 }
